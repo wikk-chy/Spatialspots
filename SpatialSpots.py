@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.neighbors import KernelDensity
 from scipy.spatial import distance_matrix
+from scipy.stats import wasserstein_distance
+from tqdm import tqdm
 
 def calculate_kde(cell_coords, bandwidth=2, grid_size=10):
     """
@@ -50,3 +52,26 @@ def calculate_morans_i(xy, density, threshold_distance=50):
     morans_i = (n / np.sum(W)) * (numerator / denominator)
 
     return morans_i
+
+def calculate_wasserstein_distance(xy, density, unique_genes):
+    # Calculate Wasserstein distances
+    w_dis = np.zeros((len(unique_genes), len(unique_genes)))
+    for i in tqdm(range(len(unique_genes)), desc="Calculating Wasserstein distances"):
+        for n in range(len(unique_genes)):
+            w_dist = wasserstein_distance(np.arange(xy.shape[0]), np.arange(xy.shape[0]),
+                                          density[i], density[n])
+            w_dis[i][n] = w_dist
+
+    return w_dis
+
+# from scipy.spatial.distance import correlation
+
+# def calculate_correlation_distance(xy, density, unique_genes):
+#     # Calculate Correlation distances
+#     corr_dis = np.zeros((len(unique_genes), len(unique_genes)))
+#     for i in tqdm(range(len(unique_genes)), desc="Calculating Correlation distances"):
+#         for n in range(len(unique_genes)):
+#             corr_dist = correlation(np.arange(xy.shape[0]), np.arange(xy.shape[0]),
+#                                     density[i], density[n])
+#             corr_dis[i][n] = corr_dist
+#     return corr_dis
