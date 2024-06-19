@@ -63,15 +63,3 @@ def calculate_wasserstein_distance(xy, density, unique_genes):
             w_dis[i][n] = w_dist
 
     return w_dis
-
-# from scipy.spatial.distance import correlation
-
-# def calculate_correlation_distance(xy, density, unique_genes):
-#     # Calculate Correlation distances
-#     corr_dis = np.zeros((len(unique_genes), len(unique_genes)))
-#     for i in tqdm(range(len(unique_genes)), desc="Calculating Correlation distances"):
-#         for n in range(len(unique_genes)):
-#             corr_dist = correlation(np.arange(xy.shape[0]), np.arange(xy.shape[0]),
-#                                     density[i], density[n])
-#             corr_dis[i][n] = corr_dist
-#     return corr_dis
