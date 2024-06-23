@@ -57,9 +57,9 @@ def calculate_morans_i(xy, density, threshold_distance=50):
     row_ind, col_ind = zip(*pairs)
     data = np.ones(len(pairs))
     W = csr_matrix((data, (row_ind, col_ind)), shape=(n, n))
-    W = W + W.T  # Ensure the matrix is symmetric
+    W = W + W.T
     row_sums = np.array(W.sum(axis=1)).flatten()
-    row_sums[row_sums == 0] = 1  # Prevent division by zero
+    row_sums[row_sums == 0] = 1
     W = W.multiply(1 / row_sums[:, np.newaxis])
     x_bar = np.mean(density)
     density_diff = density - x_bar
