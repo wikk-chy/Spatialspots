@@ -39,11 +39,6 @@ for density in densities:
 # Calculate Wasserstein Distance
 w_dis = calculate_wasserstein_distance(densities, xy, genes)
 
-
-Ensure that the three custom functions `calculate_kde`, `calculate_morans_i`, and `calculate_wasserstein_distance` are included in `your_module`.
-
-With the above example code, users can easily understand how to import and use these three functions to calculate kernel density estimation, Moran's I statistic, and Wasserstein distance.
-
 ```
 
 ## Moran's I
