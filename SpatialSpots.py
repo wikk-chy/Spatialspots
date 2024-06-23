@@ -83,7 +83,6 @@ def calculate_wasserstein_distance(densities, xy, genes):
     Returns:
     numpy.ndarray: Wasserstein distance matrix with shape (len(gene1), len(gene2))
     """
-    print('go')
     w_dis = np.zeros((len(genes), len(genes)))
     grid_points = range(xy.shape[0])
     
