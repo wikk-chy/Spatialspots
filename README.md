@@ -1,14 +1,6 @@
 # Usage Example
 
-This document explains how to use three functions to calculate kernel density estimation (KDE), Moran's I statistic, and Wasserstein distance.
-
-## Moran's I
-Calculate Moran's I for gene or cell distribution.
-
-## Wasserstein metric
-Calculate the distribution distance between spots using the Wasserstein metric.
-
-## Correlation
+This document explains how to use three functions to calculate kernel density estimation (KDE), Moran's I statistic, Correlation, Wasserstein distance.
 
 ## Function Imports
 
@@ -52,3 +44,12 @@ Ensure that the three custom functions `calculate_kde`, `calculate_morans_i`, an
 
 With the above example code, users can easily understand how to import and use these three functions to calculate kernel density estimation, Moran's I statistic, and Wasserstein distance.
 
+```
+
+## Moran's I
+Calculate Moran's I for gene or cell distribution.
+
+## Wasserstein metric
+Calculate the distribution distance between spots using the Wasserstein metric.
+
+## Correlation
