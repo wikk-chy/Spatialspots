@@ -24,7 +24,7 @@ from scipy.sparse import csr_matrix
 from tqdm import tqdm
 
 # Import custom functions
-from your_module import calculate_kde, calculate_morans_i, calculate_wasserstein_distance
+from Spatialspots import calculate_kde, calculate_morans_i, calculate_wasserstein_distance
 
 # Generate sample data
 data = {
