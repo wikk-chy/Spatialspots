@@ -2,30 +2,41 @@ import numpy as np
 from sklearn.neighbors import KernelDensity
 from scipy.spatial import distance_matrix
 from scipy.stats import wasserstein_distance
+from scipy.spatial import KDTree
+from scipy.sparse import csr_matrix
 from tqdm import tqdm
 
-def calculate_kde(cell_coords, bandwidth=2, grid_size=10):
+def calculate_kde(df, genes, bandwidth=2, grid_size=10):
     """
-    Calculate kernel density estimation on a grid
+    Calculate kernel density estimations for each unique gene in the DataFrame over a specified grid.
     
     Parameters:
-    cell_coords (numpy.ndarray): Array of coordinates with shape (n_samples, 2)
-    bandwidth (float): Bandwidth for kernel density estimation
-    grid_size (int): Size of the grid for density estimation
+    df (pandas.DataFrame): DataFrame containing the data.
+    unique_genes (list): List of unique genes to calculate KDE for.
+    csv_dir (str): Directory of the CSV file.
+    csv_path (str): Path to the CSV file.
+    bandwidth (float): Bandwidth for the KDE.
+    grid_size (int): Size of the grid division for density estimation.
     
     Returns:
-    tuple: (grid coordinates, density values)
+    list: A list of density arrays for each unique gene.
     """
-    X = cell_coords[:, 1]
-    Y = cell_coords[:, 0]
+    points = df[["dim_1", "dim_2"]].values
+    X = points[:, 1]
+    Y = points[:, 0]
     x = np.linspace(X.min(), X.max(), int((X.max() - X.min()) / grid_size))
     y = np.linspace(Y.min(), Y.max(), int((Y.max() - Y.min()) / grid_size))
     X_grid, Y_grid = np.meshgrid(x, y)
     xy = np.vstack([X_grid.ravel(), Y_grid.ravel()]).T
-    kde = KernelDensity(bandwidth=bandwidth).fit(cell_coords)
-    density = np.exp(kde.score_samples(xy))
 
-    return xy, density
+    densities = []
+    for gene in tqdm(genes):
+        gene_points = df[df["gene"] == gene][["dim_1", "dim_2"]].values
+        kde = KernelDensity(bandwidth=bandwidth).fit(gene_points)
+        density = np.exp(kde.score_samples(xy))
+        densities.append(density)
+
+    return xy, densities
 
 def calculate_morans_i(xy, density, threshold_distance=50):
     """
@@ -39,27 +50,22 @@ def calculate_morans_i(xy, density, threshold_distance=50):
     Returns:
     float: Computed Moran's I statistic
     """
-    dist_matrix = distance_matrix(xy, xy)
-    W = np.where(dist_matrix <= threshold_distance, 1, 0)
-    row_sums = W.sum(axis=1, keepdims=True)
-    row_sums[row_sums == 0] = 1  # Prevent division by zero
-    W = W / row_sums
-
-    x_bar = np.mean(density)
+    tree = KDTree(xy)
     n = len(density)
-    numerator = np.sum(W * np.outer(density - x_bar, density - x_bar))
-    denominator = np.sum((density - x_bar) ** 2)
-    morans_i = (n / np.sum(W)) * (numerator / denominator)
+    pairs = tree.query_pairs(threshold_distance)
+    
+    row_ind, col_ind = zip(*pairs)
+    data = np.ones(len(pairs))
+    W = csr_matrix((data, (row_ind, col_ind)), shape=(n, n))
+    W = W + W.T  # Ensure the matrix is symmetric
+    row_sums = np.array(W.sum(axis=1)).flatten()
+    row_sums[row_sums == 0] = 1  # Prevent division by zero
+    W = W.multiply(1 / row_sums[:, np.newaxis])
+    x_bar = np.mean(density)
+    density_diff = density - x_bar
+    numerator = W.multiply(np.outer(density_diff, density_diff)).sum()
+    denominator = np.sum(density_diff ** 2)
+    
+    morans_i = (n / W.sum()) * (numerator / denominator)
 
     return morans_i
-
-def calculate_wasserstein_distance(xy, density, unique_genes):
-    # Calculate Wasserstein distances
-    w_dis = np.zeros((len(unique_genes), len(unique_genes)))
-    for i in tqdm(range(len(unique_genes)), desc="Calculating Wasserstein distances"):
-        for n in range(len(unique_genes)):
-            w_dist = wasserstein_distance(np.arange(xy.shape[0]), np.arange(xy.shape[0]),
-                                          density[i], density[n])
-            w_dis[i][n] = w_dist
-
-    return w_dis
