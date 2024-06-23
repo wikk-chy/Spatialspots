@@ -69,3 +69,28 @@ def calculate_morans_i(xy, density, threshold_distance=50):
     morans_i = (n / W.sum()) * (numerator / denominator)
 
     return morans_i
+
+def calculate_wasserstein_distance(densities, xy, genes):
+    """
+    Calculate the Wasserstein distance matrix for the given densities and gene lists.
+
+    Parameters:
+    densities (numpy.ndarray): Density values with shape (n_genes, n_grid_points)
+    xy (numpy.ndarray): Grid coordinates with shape (n_grid_points, 2)
+    gene1 (list): List of indices for the first set of genes
+    gene2 (list): List of indices for the second set of genes
+    
+    Returns:
+    numpy.ndarray: Wasserstein distance matrix with shape (len(gene1), len(gene2))
+    """
+    print('go')
+    w_dis = np.zeros((len(genes), len(genes)))
+    grid_points = range(xy.shape[0])
+    
+    for i in tqdm(range(len(genes))):
+        for j in range(len(genes)):
+            w_dist = wasserstein_distance(grid_points, grid_points, densities[i], densities[j])
+            w_dis[i, j] = w_dist
+    
+    return w_dis
+
