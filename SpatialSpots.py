@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.neighbors import KernelDensity
-from scipy.spatial import distance_matrix
+from scipy.spatial.distance import correlation
 from scipy.stats import wasserstein_distance
 from scipy.spatial import KDTree
 from scipy.sparse import csr_matrix
@@ -93,3 +93,27 @@ def calculate_wasserstein_distance(densities, xy, genes):
     
     return w_dis
 
+def calculate_correlation(densities, 
+                          genes: str) -> np.ndarray:
+    """
+    Calculate the Wasserstein distance matrix for the given densities and gene lists.
+
+    Parameters:
+    densities (numpy.ndarray): Density values with shape (n_genes, n_grid_points), where each row represents
+                               the density over a grid for a specific gene.
+    xy (numpy.ndarray): Grid coordinates with shape (n_grid_points, 2), which might be used to weigh the distances
+                        if needed, but are not directly used in this simple implementation.
+    gene1 (list): List of indices for the first set of genes, determining rows from 'densities' to be used.
+    gene2 (list): List of indices for the second set of genes, determining rows from 'densities' to be used.
+    
+    Returns:
+    numpy.ndarray: Wasserstein distance matrix with shape (len(gene1), len(gene2)), where each element [i, j]
+                   is the Wasserstein distance between the i-th gene in gene1 and the j-th gene in gene2.
+    """
+    c_mtx = np.zeros((len(genes), len(genes)))
+    for i in tqdm(range(len(genes)), desc="Calculating Correlation"):
+        for n in range(len(genes)):
+            c_dist = correlation(densities[i], densities[n])
+            c_mtx[i][n] = 1 - c_dist
+
+    return c_mtx
