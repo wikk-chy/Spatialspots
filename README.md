@@ -39,6 +39,10 @@ for density in densities:
 # Calculate Wasserstein Distance
 w_dis = calculate_wasserstein_distance(densities, xy, genes)
 
+# Calculate Correlation
+correlation = calculate_correlation(densities, genes=genes)
+
+
 ```
 
 ## Moran's I
