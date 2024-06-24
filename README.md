@@ -52,3 +52,5 @@ Calculate Moran's I for gene or cell distribution.
 Calculate the distribution distance between spots using the Wasserstein metric.
 
 ## Correlation
+Calculate the Correlation between spots
+
